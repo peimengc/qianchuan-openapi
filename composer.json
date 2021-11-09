@@ -1,0 +1,19 @@
+{
+    "name": "peimengc\/qianchuan-openapi",
+    "description": "千川开放平台API",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "peimengc",
+            "email": "931692760@qq.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Peimengc\\QianchuanOpenapi\\": "src"
+        }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^7.4"
+    }
+}
