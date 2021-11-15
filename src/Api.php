@@ -153,7 +153,7 @@ class Api
     //更新计划状态
     public function adStatusUpdate($adIds, $advertiserId, $optStatus)
     {
-        if (count($adIds)) {
+        if (count($adIds) > 10 || count($adIds) < 1) {
             throw new InvalidArgumentException('更新计划状态，一次最多可以处理10个计划');
         }
         return $this->httpJson('/open_api/v1.0/qianchuan/ad/status/update/', [
@@ -166,7 +166,7 @@ class Api
     //更新计划预算
     public function adBudgetUpdate($advertiserId, array $data)
     {
-        if (count($data)) {
+        if (count($data) > 10 || count($data) < 1) {
             throw new InvalidArgumentException('更新广告计划的预算，一次最多可以处理10个计划');
         }
         return $this->httpJson('/open_api/v1.0/qianchuan/ad/budget/update/', [
@@ -178,7 +178,7 @@ class Api
     //更新计划出价
     public function adBidUpdate($advertiserId, array $data)
     {
-        if (count($data)) {
+        if (count($data) > 10 || count($data) < 1) {
             throw new InvalidArgumentException('更新广告计划的出价，一次最多可以处理10个计划');
         }
         return $this->httpJson('/open_api/v1.0/qianchuan/ad/bid/update/', [
@@ -205,7 +205,7 @@ class Api
         if (!isset($filtering['marketing_goal']) || !in_array($filtering['marketing_goal'], ['VIDEO_PROM_GOODS', 'LIVE_PROM_GOODS'])) {
             throw new InvalidArgumentException("过滤条件filtering.marketing_goal(营销目标),必填,允许值：VIDEO_PROM_GOODS, LIVE_PROM_GOODS");
         }
-        if (isset($filtering['ids']) && count($filtering['ids']) > 100) {
+        if (isset($filtering['ids']) && (count($filtering['ids']) > 100 || count($filtering['ids']) < 1)) {
             throw new InvalidArgumentException("过滤条件filtering.ids(计划ID) 长度限制 1-100");
         }
         if (isset($filtering['ad_create_start_date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $filtering['ad_create_start_date']) === 0) {
@@ -217,10 +217,10 @@ class Api
         if (isset($filtering['ad_modify_time']) && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}$/', $filtering['ad_modify_time']) === 0) {
             throw new InvalidArgumentException("过滤条件filtering.ad_modify_time(计划修改时间),格式：'yyyy-mm-dd HH'");
         }
-        return $this->httpGet('/open_api/v1.0/qianchuan/ad/detail/get/', [
+        return $this->httpGet('/open_api/v1.0/qianchuan/ad/get/', [
             'advertiser_id' => $advertiserId,
             'request_aweme_info' => 1,
-            'filtering' => $filtering,
+            'filtering' => json_encode($filtering),
             'page' => $page,
             'page_size' => $pageSize,
         ]);
@@ -334,16 +334,20 @@ class Api
         if (strtotime($endDate . ' 23:59:59') - strtotime($startDate . ' 00:00:00') > 180 * 24 * 3600) {
             throw new InvalidArgumentException("过滤条件start_date(开始时间)-end_date(开始时间),时间跨度不能超过180天");
         }
-        return $this->httpGet('/open_api/v1.0/qianchuan/report/ad/get/', [
+        $data = [
             'advertiser_id' => $advertiserId,
             'start_date' => $startDate,
             'end_date' => $endDate,
             'filtering' => json_encode($filtering),
-            'order_field' => $orderField,
-            'order_type' => $orderType,
+            'fields' => json_encode($fields),
             'page' => $page,
             'page_size' => $pageSize,
-        ]);
+        ];
+        if ($orderField) {
+            $data['order_field'] = $orderField;
+            $data['order_type'] = $orderType;
+        }
+        return $this->httpGet('/open_api/v1.0/qianchuan/report/ad/get/', $data);
     }
 
     //获取广告创意数据
