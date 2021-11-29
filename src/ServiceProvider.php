@@ -10,18 +10,18 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
     public function register()
     {
-        $this->app->singleton(Api::class, function () {
-            $app = $this->getApp();
-            if (!isset($app['appid']) || !isset($app['secret'])) {
+        $this->app->singleton(Api::class, function ($app, $params) {
+            $config = $params ?: $this->getConfig();
+            if (!isset($config['appid']) || !isset($config['secret'])) {
                 throw new InvalidArgumentException("appid 和 secret 获取异常");
             }
-            return new Api($app['appid'], $app['secret']);
+            return new Api($config['appid'], $config['secret']);
         });
 
         $this->app->alias(Api::class, 'qianchuan-openapi');
     }
 
-    protected function getApp()
+    protected function getConfig()
     {
         $apps = config('services.qianchuan-openapi.apps', []);
 

@@ -102,7 +102,7 @@ class Api
 
     public function refreshToken($refresh_token)
     {
-        return $this->httpJson('/open_api/oauth2/access_token/', [
+        return $this->httpJson('/open_api/oauth2/refresh_token/', [
             'app_id' => $this->appid,
             'secret' => $this->secret,
             'grant_type' => 'refresh_token',
